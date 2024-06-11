@@ -46,11 +46,9 @@ class MemberControllerTest extends IntegrationTest {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    private final int ITERATIONS = 5000;
-
     @BeforeEach
     void setUp() {
-        for (int i = 0; i < ITERATIONS; i++) {
+        for (int i = 0; i < 100000; i++) {
             String var = "" + i;
             Theme theme = new Theme(new Name(var), var, var, (long) i);
             themeRepository.save(theme);
@@ -70,36 +68,31 @@ class MemberControllerTest extends IntegrationTest {
     }
 
     @Test
-    void test() throws InterruptedException {
+    void test() {
         int memberId = 1;
 
         Token token = tokenProvider.getAccessToken(memberId);
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
 
         long start1 = System.nanoTime();
-        for (int i = 0; i < ITERATIONS; i++) {
-            RestAssured.given()
-                    .cookie(cookie.toString())
-                    .contentType(ContentType.JSON)
-                    .when().get("/member/registrations/multiple-queries");
-        }
+        RestAssured.given()
+                .cookie(cookie.toString())
+                .contentType(ContentType.JSON)
+                .when().get("/member/registrations/multiple-queries");
         long end1 = System.nanoTime();
         long time1 = end1 - start1;
         System.out.println("=======");
-        System.out.println("iteration : " + ITERATIONS);
-        System.out.println("multiple-queries total time : " + time1 / 1000000 + "ms");
+        System.out.println("가벼운 여러 쿼리 : " + time1 / 1000000 + "ms");
 
         long start2 = System.nanoTime();
-        for (int i = 0; i < ITERATIONS; i++) {
-            RestAssured.given()
-                    .cookie(cookie.toString())
-                    .contentType(ContentType.JSON)
-                    .when().get("/member/registrations/multiple-joins");
-        }
+        RestAssured.given()
+                .cookie(cookie.toString())
+                .contentType(ContentType.JSON)
+                .when().get("/member/registrations/multiple-joins");
         long end2 = System.nanoTime();
         long time2 = end2 - start2;
-        System.out.println("multiple-joins time : " + time2 / 1000000 + "ms");
-        System.out.println((time1-time2 > 0 ? "multiple-joins" : "multiple-queries") + " is faster by " + Math.abs(time2- time1) / 1000000 + "ms");
+        System.out.println("복잡한 한방 쿼리 : " + time2 / 1000000 + "ms");
+        System.out.println((time1-time2 > 0 ? "복잡한 한방 쿼리" : "가벼운 여러 쿼리") + "가 " + Math.abs(time2- time1) / 1000000 + "ms 더 빠르다.");
         System.out.println("=======");
     }
 }
