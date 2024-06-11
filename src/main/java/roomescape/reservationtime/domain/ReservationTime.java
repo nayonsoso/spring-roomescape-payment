@@ -51,9 +51,9 @@ public class ReservationTime {
         if (startAt == null) {
             throw new RoomEscapeException(ReservationTimeExceptionCode.FOUND_TIME_IS_NULL_EXCEPTION);
         }
-        if (startAt.isBefore(OPEN_TIME) || startAt.isAfter(CLOSE_TIME)) {
-            throw new RoomEscapeException(ReservationTimeExceptionCode.TIME_IS_OUT_OF_OPERATING_TIME);
-        }
+//        if (startAt.isBefore(OPEN_TIME) || startAt.isAfter(CLOSE_TIME)) {
+//            throw new RoomEscapeException(ReservationTimeExceptionCode.TIME_IS_OUT_OF_OPERATING_TIME);
+//        }
     }
 
     public boolean isBeforeTime(LocalTime time) {

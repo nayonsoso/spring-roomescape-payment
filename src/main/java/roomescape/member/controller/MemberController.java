@@ -32,10 +32,30 @@ public class MemberController implements MemberControllerSwagger {
         return memberService.findMembersId();
     }
 
+    @GetMapping("/member/registrations/multiple-queries")
+    public List<RegistrationInfoDto> memberReservationListByMultipleQueries(@LoginMemberId long memberId) {
+            reservationService.findMemberReservationsByMultipleQueries(memberId)
+                .stream()
+                .map((RegistrationInfoDto::from))
+                .toList();
+
+        return null;
+    }
+
+    @GetMapping("/member/registrations/multiple-joins")
+    public List<RegistrationInfoDto> memberReservationListByMultipleJoins(@LoginMemberId long memberId) {
+        reservationService.findMemberReservationsByMultipleJoins(memberId)
+                .stream()
+                .map((RegistrationInfoDto::from))
+                .toList();
+
+        return null;
+    }
+
     @Override
     @GetMapping("/member/registrations")
     public List<RegistrationInfoDto> memberReservationList(@LoginMemberId long memberId) {
-        List<RegistrationInfoDto> reservationsOfMember = reservationService.findMemberReservations(memberId)
+        List<RegistrationInfoDto> reservationsOfMember = reservationService.findMemberReservationsByMultipleQueries(memberId)
                 .stream()
                 .map((RegistrationInfoDto::from))
                 .toList();

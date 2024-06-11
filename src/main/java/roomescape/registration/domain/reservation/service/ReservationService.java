@@ -12,6 +12,7 @@ import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.exception.model.ThemeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.registration.domain.reservation.domain.Reservation;
@@ -118,8 +119,23 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> findMemberReservations(long id) {
+    public List<ReservationResponse> findMemberReservationsByMultipleJoins(long id) {
         return reservationRepository.findAllReservationsWithPaymentsByMemberId(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> findMemberReservationsByMultipleQueries(long id) {
+        List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
+        return reservations.stream()
+                .map(reservation -> {
+                    Optional<Payment> optionalPayment = paymentRepository.findByReservationId(reservation.getId());
+                    if (optionalPayment.isPresent()) {
+                        return ReservationResponse.from(reservation, optionalPayment.get());
+                    }
+
+                    return ReservationResponse.from(reservation);
+                })
+                .toList();
     }
 
     @Transactional

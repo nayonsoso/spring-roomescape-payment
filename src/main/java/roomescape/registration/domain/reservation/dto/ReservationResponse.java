@@ -1,6 +1,7 @@
 package roomescape.registration.domain.reservation.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import roomescape.payment.domain.Payment;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.dto.PaymentResponse;
 
@@ -31,5 +32,12 @@ public record ReservationResponse(
         return new ReservationResponse(reservation.getId(), reservation.getMember().getName(),
                 reservation.getTheme().getName(), reservation.getDate(),
                 reservation.getReservationTime().getStartAt(), PaymentResponse.getPaymentResponseForNotPaidReservation());
+    }
+
+
+    public static ReservationResponse from(Reservation reservation, Payment payment) {
+        return new ReservationResponse(reservation.getId(), reservation.getMember().getName(),
+                reservation.getTheme().getName(), reservation.getDate(),
+                reservation.getReservationTime().getStartAt(), PaymentResponse.from(payment));
     }
 }
